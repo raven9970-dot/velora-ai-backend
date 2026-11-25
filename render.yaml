@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: velora-ai-designer-backend
+    runtime: node
+    plan: free
+    buildCommand: node --check server.js
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: VELORA_ACCESS_TOKEN
+        sync: false
+      - key: DESIGNER_REQUESTS_PER_MINUTE
+        value: 3
