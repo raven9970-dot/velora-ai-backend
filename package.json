@@ -1,7 +1,0 @@
-{
-  "name": "velora-ai-designer",
-  "version": "6.1.2",
-  "private": true,
-  "description": "VELORA AI Designer (Vercel)",
-  "engines": { "node": "26.x" }
-}
