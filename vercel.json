@@ -1,0 +1,5 @@
+{
+  "functions": {
+    "api/ai/designer/generate.js": { "maxDuration": 300 }
+  }
+}
