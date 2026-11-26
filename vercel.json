@@ -1,8 +1,5 @@
 {
   "framework": null,
   "buildCommand": "",
-  "outputDirectory": "public",
-  "functions": {
-    "api/ai/designer/generate.js": { "maxDuration": 300 }
-  }
+  "outputDirectory": "public"
 }
