@@ -1,0 +1,13 @@
+{
+  "name": "velora-ai-designer",
+  "version": "6.1.1",
+  "private": true,
+  "description": "VELORA AI Designer Studio backend (Node.js built-in modules only)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
