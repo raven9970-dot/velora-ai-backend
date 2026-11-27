@@ -1116,6 +1116,15 @@
         </div>
       </div>
 
+      <div class="card" id="aiOrchestrator">
+        <h2>AI Orkestrator <span class="muted">Multi-agen</span></h2>
+        <div class="ecosystem-note" style="margin-bottom:9px;">Satu asisten yang membagi tugas ke agen: Analis Stok, Pemasaran, Desainer, dan Keuangan. Memakai URL dan token yang sama dengan AI Designer Studio.</div>
+        <textarea id="orcMessage" maxlength="2000" placeholder="Contoh: Stok apa yang menipis dan buatkan caption promo untuk produk terlaris"></textarea>
+        <div style="margin-top:8px;"><button type="button" class="btn-primary" id="btnOrcSend">Tanya Orkestrator</button></div>
+        <div id="orcStatus" class="designer-status" role="status" aria-live="polite"></div>
+        <div id="orcReply" style="white-space:pre-wrap;margin-top:8px;"></div>
+      </div>
+
       <div class="card">
         <h2>Integrasi Platform</h2>
         <div class="integration-row"><span>POS &amp; Inventory VELORA</span><span class="module-state ready">Aktif lokal</span></div>
@@ -2965,6 +2974,36 @@
 
 
     // VELORA 6.1.1 — Android connects to a separately hosted HTTPS backend.
+    /* VELORA AI Orkestrator */
+    function orcContext() {
+      try {
+        const lines = [];
+        (state.barang || []).slice(0, 40).forEach((b) => lines.push(`Stok: ${b.nama} ${b.stok} ${b.uom || ""} (batas ${b.limit == null ? "-" : b.limit})`));
+        (state.recipes || []).slice(0, 20).forEach((r) => lines.push(`Produk: ${r.nama}, harga jual ${formatRp(getRecipeTotalSellPrice(r))}`));
+        (state.salesLog || []).slice(-30).forEach((x) => lines.push(`Penjualan: ${x.namaProduk || x.nama || "?"} x${x.qty || ""} total ${x.totalHarga || ""}`));
+        return lines.join("\n").slice(0, 5500);
+      } catch (_) { return ""; }
+    }
+    async function sendOrchestrator() {
+      const status = document.getElementById("orcStatus");
+      const out = document.getElementById("orcReply");
+      const message = document.getElementById("orcMessage").value.trim();
+      if (!message) { status.textContent = "Tulis pertanyaan dulu."; status.className = "designer-status err"; return; }
+      status.textContent = "Orkestrator bekerja, mohon tunggu..."; status.className = "designer-status"; out.textContent = "";
+      try {
+        const response = await fetch(designerApiUrl("/api/ai/orchestrator"), { method: "POST", headers: designerHeaders(true), body: JSON.stringify({ message, context: orcContext() }) });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || ("Error " + response.status));
+        out.textContent = data.reply || "(jawaban kosong)";
+        status.textContent = "Selesai" + (data.agents && data.agents.length ? " · agen dipakai: " + data.agents.join(", ") : " · dijawab langsung");
+        status.className = "designer-status ok";
+      } catch (error) {
+        status.textContent = error instanceof TypeError ? "Tidak bisa menjangkau server. Periksa URL, internet, dan Deployment Protection." : error.message;
+        status.className = "designer-status err";
+      }
+    }
+    document.getElementById("btnOrcSend").addEventListener("click", sendOrchestrator);
+
     const DESIGNER_CONFIG_KEY = "velora_designer_connection_v611";
     let designerGeneratedUrl = "";
     function getDesignerConfig() {
